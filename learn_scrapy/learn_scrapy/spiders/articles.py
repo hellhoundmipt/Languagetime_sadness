@@ -15,7 +15,7 @@ class RedditSpider(scrapy.Spider):
             yield {'text': divs.xpath('p/text()').extract()}         #тут сохраняю только новость
 
 
-# Паук по рускоязычному ресурсу 4pda.ru, в .jl и .json русские слова (хотя, скорее, буквы) замениются на символы \u*
+# Паук по рускоязычному ресурсу 4pda.ru, в .jl и .json русские слова (хотя, скорее, буквы) заменяются на символы \u*
 
 class ArticleSpider(scrapy.Spider):
     name = "comments"
@@ -99,7 +99,15 @@ class PdaSpider(scrapy.Spider):
                 comment_text = re.sub(pattern, '. ', comment_text)
 
             if (comment_is_full == True) and len(comment_text) > 0:
-                yield {'comment': comment_text[:-1]}  #сохраняем сами комментарии
+                #делаем первую букву заглавной
+                if comment_text[0].islower():
+                    comment_text = comment_text.replace(comment_text[0], comment_text[0].upper(), 1)
+                    
+                #вставляем пробел после последней точки
+                comment_text = comment_text + ' '
+                
+                #сохраняем сами комментарии
+                yield {'comment': comment_text[:-1]}  
                 comment_text = ''
 
 
@@ -114,6 +122,6 @@ class PdaSpider(scrapy.Spider):
 
 
     def parse(self, response):
-        for page_num in range(1, 100):
+        for page_num in range(1, 10):
             new_page = "http://4pda.ru/page/" + str(page_num)
             yield scrapy.Request(new_page, callback=self.parse_page)

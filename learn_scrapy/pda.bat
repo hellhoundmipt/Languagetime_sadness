@@ -1,4 +1,5 @@
 del pda.jl
 del pda.json
-scrapy crawl pda -o pda.json -t json --nolog
+del pda.xml
+scrapy crawl pda -o pda.jl -t jl --nolog
 PAUSE
